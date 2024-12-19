@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>Add Todo</h1>
+        <form id="add-form">
+            <input id="todo-title" name="title" type="text" placeholder="Enter Task Name" required />
+            <input id="todo-due-date" name="duedate" type="date" required />
+            <button id="add-button" type="submit">Add Task</button>
+        </form>
+    </div>
+</body>
+<script>
+    const todoForm = document.getElementById("add-form");
+    const todoTitle = document.getElementById("todo-title");
+    const todoDueDate = document.getElementById("todo-due-date");
+
+    todoForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        addTodo();
+    })
+
+    function addTodo() {
+        const title = todoTitle.value.trim();
+        const dueDate = todoDueDate.value;
+
+        fetch("http://localhost:3000/api/todos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title, "due_date": dueDate })
+        }).then(() => {
+            todoTitle.value = "";
+            todoDueDate.value = "";
+            window.location.href = "index.html";
+        }).catch((error) =>
+            console.error("error in adding todo", error)
+        )
+    }
+</script>
+</script>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Completion</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <h1>Task Completed</h1>
+    <div class="wrapper">
+        <div class="button-wrapper">
+            <a href="index.html"><button id="view-button">Home</button></a>
+        </div>
+        <ul id="todo-list"></ul>
+    </div>
+</body>
+<script>
+    const todoList = document.getElementById("todo-list");
+
+    function fetchTodosCompleted() {
+        fetch("http://localhost:3000/api/todos")
+            .then((response) => response.json())
+            .then((todos) => {
+                todoList.innerHTML = "";
+                todos.forEach((todo) => {
+                    if (todo.completed == 1) {
+                        const todoTitle = createTodoElementForView(todo);
+                        todoList.append(todoTitle);
+                    }
+                });
+            }).catch((error) =>
+                console.error("error in fetching completed tasks", error)
+            )
+
+    }
+
+    function createTodoElementForView(todo) {
+        const todoLi = document.createElement("li");
+        todoLi.className = "todo";
+        todoLi.innerHTML = `
+        <span class="todo-text">${todo.title}</span>
+        <span class="todo-date">${todo.dueDate || ""}</span>
+        <button class="incomplete-button" onclick="markInAsCompleted(${todo.id})">
+            <svg fill="var(--secondary-color)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="24" height="24">
+            <path d="M64 .3C28.7.3 0 28.8 0 64s28.7 63.7 64 63.7 64-28.5 64-63.7S99.3.3 64 .3zm0 121C32.2 121.3 6.4 95.7 6.4 64 6.4 32.3 32.2 6.7 64 6.7s57.6 25.7 57.6 57.3c0 31.7-25.8 57.3-57.6 57.3zm21.9-73.2L81 43.3c-.9-.9-2.3-.9-3.2 0L64 57 50.2 43.3c-.9-.9-2.3-.9-3.2 0l-4.9 4.8c-.9.9-.9 2.3 0 3.2L55.9 65 42.1 78.8c-.9.9-.9 2.3 0 3.2l4.9 4.8c.9.9 2.3.9 3.2 0L64 73.1l13.8 13.7c.9.9 2.3.9 3.2 0l4.9-4.8c.9-.9.9-2.3 0-3.2L72.1 65l13.8-13.7c.9-.9.9-2.3 0-3.2z"/>
+            </svg>
+            <span class="tooltip">Mark Task as InComplete</span>
+        </button>
+        <button class="delete-button" onclick="deleteTodoItem(${todo.id})">
+            <svg fill="var(--secondary-color)" xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+            <span class="tooltip">Delete Task</span>
+        </button>`;
+
+        return todoLi;
+    }
+    function markInAsCompleted(id) {
+        fetch(`http://localhost:3000/api/todos/${id}/inCompleted`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+        }).then(() => {
+            console.log("todo item marked sucessfully");
+        }).catch((error) => {
+            console.log("Error in marking todo item", error);
+            alert("Error in marking  todo item")
+        })
+    }
+    function deleteTodoItem(id) {
+        fetch(`http://localhost:3000/api/todos/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        }).then((response) => response.json)
+            .then(() => {
+                console.log("todo item deleted sucessfully");
+            }).catch((error) => {
+                console.log("Error in deleting todo item", error);
+                alert("Error in deleting todo item")
+            })
+    }
+    fetchTodosCompleted();
+
+</script>
+
+</html>
